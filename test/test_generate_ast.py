@@ -13,7 +13,6 @@ from helion._testing import code_and_output
 from helion._testing import import_path
 from helion._testing import onlyBackends
 from helion._testing import skipIfRefEager
-from helion._testing import skipIfTileIR
 import helion.language as hl
 
 datadir = Path(__file__).parent / "data"
@@ -215,7 +214,6 @@ class TestGenerateAst(RefEagerTestBase, TestCase):
         # Ensure codegen emits a final tl.cast(..., tl.bfloat16)
         assert "tl.cast" in code and "tl.bfloat16" in code
 
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_sigmoid_scalar_autocast(self):
         @helion.kernel(
             config=helion.Config(
@@ -250,7 +248,6 @@ class TestGenerateAst(RefEagerTestBase, TestCase):
 
         torch.testing.assert_close(result, expected, atol=1e-1, rtol=1e-1)
 
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_fast_sigmoid(self):
         @helion.kernel(
             config=helion.Config(

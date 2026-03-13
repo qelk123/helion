@@ -16,7 +16,6 @@ from helion._testing import code_and_output
 from helion._testing import import_path
 from helion._testing import onlyBackends
 from helion._testing import skipIfRefEager
-from helion._testing import skipIfTileIR
 from helion._testing import skipUnlessTensorDescriptor
 import helion.language as hl
 
@@ -133,7 +132,6 @@ class TestMatmul(RefEagerTestBase, TestCase):
         torch.testing.assert_close(output, args[0] @ args[1], atol=1e-1, rtol=1e-2)
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_matmul_block_ptr(self):
         args = (
             torch.randn([128, 128], device=DEVICE, dtype=torch.float32),

@@ -927,7 +927,6 @@ class TestIndexing(RefEagerTestBase, TestCase):
         torch.testing.assert_close(result, expected)
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_broadcasting_block_ptr_indexing(self):
         x = torch.randn([16, 24, 32], device=DEVICE)
         bias1 = torch.randn([1, 24, 32], device=DEVICE)
@@ -1574,7 +1573,6 @@ class TestIndexing(RefEagerTestBase, TestCase):
         torch.testing.assert_close(result, x[10:])
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_tile_with_offset_block_ptr(self):
         """Test Tile+offset with block_ptr indexing"""
 
@@ -1687,7 +1685,6 @@ class TestIndexing(RefEagerTestBase, TestCase):
         torch_out = torch.nn.functional.scaled_dot_product_attention(q, k, v)
         torch.testing.assert_close(o, torch_out, atol=1e-2, rtol=1e-2)
 
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_per_load_indexing(self):
         @helion.kernel
         def multi_load_kernel(
@@ -1765,7 +1762,6 @@ class TestIndexing(RefEagerTestBase, TestCase):
         self.assertEqual(code2, code3)
 
     @skipIfRefEager("needs debugging")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_per_load_and_store_indexing(self):
         """Test that both loads and stores can have independent indexing strategies."""
 
@@ -2291,7 +2287,6 @@ class TestIndexing(RefEagerTestBase, TestCase):
         torch.testing.assert_close(out1, expected_out1)
         self.assertEqual(scales1.shape, (1, 2))
 
-    @skipIfTileIR("TileIR does not support gather operation")
     def test_gather_2d_dim1(self):
         @helion.kernel()
         def test_gather(
@@ -2321,7 +2316,6 @@ class TestIndexing(RefEagerTestBase, TestCase):
 
         torch.testing.assert_close(result, expected)
 
-    @skipIfTileIR("TileIR does not support gather operation")
     def test_gather_2d_dim0(self):
         @helion.kernel()
         def test_gather(

@@ -16,7 +16,6 @@ from helion._testing import onlyBackends
 from helion._testing import skipIfNotTriton
 from helion._testing import skipIfPallas
 from helion._testing import skipIfRefEager
-from helion._testing import skipIfTileIR
 from helion._testing import skipUnlessTensorDescriptor
 from helion._testing import xfailIfCute
 from helion._testing import xfailIfPallas
@@ -393,7 +392,6 @@ class TestReductions(RefEagerTestBase, TestCase):
         torch.testing.assert_close(result1, result2, rtol=1e-3, atol=1e-3)
 
     @xfailIfPallas("fp16/bf16 1D tensors hit TPU Mosaic sublane alignment error")
-    @skipIfTileIR("TileIR does not support log1p")
     def test_fp16_math_ops_fp32_fallback(self):
         """Test that mathematical ops with fp16/bfloat16 inputs now work via fp32 fallback."""
 
@@ -661,7 +659,6 @@ class TestReductions(RefEagerTestBase, TestCase):
 
     @xfailIfCute("barrier-separated multi-rdim reduction loops are unsupported in CuTe")
     @skipIfPallas("barrier and persistent_blocked not supported on Pallas")
-    @skipIfTileIR("TileIR does not support barrier operations")
     def test_reduction_loop_with_multiple_rdims(self):
         """Test that reduction_loops works when there are multiple reduction dimensions."""
 

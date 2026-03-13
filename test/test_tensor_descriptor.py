@@ -195,7 +195,7 @@ class TestTensorDescriptor(RefEagerTestBase, TestCase):
         # This is important for correctness
 
     @skipUnlessTensorDescriptor("Tensor descriptor support is required")
-    @skipIfTileIR("tileir backend will ignore `range_num_stages` hints")
+    @skipIfTileIR("tileir backend will ignore `range_num_stages` hint")
     def test_multistage_range_tensor_descriptor(self):
         @helion.kernel(
             config=helion.Config(

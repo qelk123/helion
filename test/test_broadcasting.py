@@ -13,7 +13,6 @@ from helion._testing import TestCase
 from helion._testing import code_and_output
 from helion._testing import onlyBackends
 from helion._testing import skipIfRefEager
-from helion._testing import skipIfTileIR
 from helion._testing import skipIfXPU
 from helion._testing import xfailIfCute
 from helion._testing import xfailIfPallas
@@ -84,7 +83,6 @@ class TestBroadcasting(RefEagerTestBase, TestCase):
 
     @xfailIfPallas("asserts Triton-specific codegen")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     @xfailIfCute(
         "None-index broadcasting (e.g. b[tile, None]) is unsupported in CuTe indexing lowering"
     )
@@ -131,7 +129,6 @@ class TestBroadcasting(RefEagerTestBase, TestCase):
         torch.testing.assert_close(out, sum(args))
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     @skipIfXPU("Type promotion issue on XPU backend")
     def test_python_float_promotion(self):
         # Repro for https://github.com/pytorch/helion/issues/493

@@ -12,7 +12,6 @@ from helion._testing import TestCase
 from helion._testing import code_and_output
 from helion._testing import onlyBackends
 from helion._testing import skipIfRocm
-from helion._testing import skipIfTileIR
 import helion.language as hl
 
 
@@ -22,7 +21,6 @@ class TestInlineAsmElementwise(RefEagerTestDisabled, TestCase):
         DEVICE.type != "cuda", reason="inline_asm_elementwise is only supported on CUDA"
     )
     @skipIfRocm("only works on cuda")
-    @skipIfTileIR("TileIR does not support inline_asm_elementwise")
     def test_inline_asm_simple(self):
         """Test basic inline_asm_elementwise with simple assembly"""
 
@@ -52,7 +50,6 @@ class TestInlineAsmElementwise(RefEagerTestDisabled, TestCase):
         DEVICE.type != "cuda", reason="inline_asm_elementwise is only supported on CUDA"
     )
     @skipIfRocm("only works on cuda")
-    @skipIfTileIR("TileIR does not support inline_asm_elementwise")
     def test_inline_asm_shift_operation(self):
         """Test inline_asm_elementwise with shift operation (similar to Triton test)"""
 
@@ -91,7 +88,6 @@ class TestInlineAsmElementwise(RefEagerTestDisabled, TestCase):
         DEVICE.type != "cuda", reason="inline_asm_elementwise is only supported on CUDA"
     )
     @skipIfRocm("only works on cuda")
-    @skipIfTileIR("TileIR does not support inline_asm_elementwise")
     def test_inline_asm_multiple_outputs(self):
         """Test inline_asm_elementwise with multiple outputs"""
 
@@ -140,7 +136,6 @@ class TestInlineAsmElementwise(RefEagerTestDisabled, TestCase):
         DEVICE.type != "cuda", reason="inline_asm_elementwise is only supported on CUDA"
     )
     @skipIfRocm("only works on cuda")
-    @skipIfTileIR("TileIR does not support inline_asm_elementwise")
     def test_inline_asm_packed(self):
         """Test inline_asm_elementwise with pack > 1"""
 
@@ -197,7 +192,6 @@ class TestInlineAsmElementwise(RefEagerTestDisabled, TestCase):
         DEVICE.type != "cuda", reason="inline_asm_elementwise is only supported on CUDA"
     )
     @skipIfRocm("only works on cuda")
-    @skipIfTileIR("TileIR does not support inline_asm_elementwise")
     def test_inline_asm_empty_args(self):
         """Test inline_asm_elementwise with empty args (should work like Triton)"""
 
@@ -226,7 +220,6 @@ class TestInlineAsmElementwise(RefEagerTestDisabled, TestCase):
         torch.testing.assert_close(result, expected)
 
     @skipIfRocm("only works on cuda")
-    @skipIfTileIR("TileIR does not support inline_asm_elementwise")
     def test_inline_asm_basic_compilation(self):
         """Test that inline_asm_elementwise compiles without errors (no CUDA requirement)"""
 

@@ -13,7 +13,6 @@ from helion._testing import TestCase
 from helion._testing import code_and_output
 from helion._testing import onlyBackends
 from helion._testing import skipIfRefEager
-from helion._testing import skipIfTileIR
 import helion.language as hl
 
 
@@ -181,7 +180,6 @@ class TestMasking(RefEagerTestBase, TestCase):
     @skipIfRefEager(
         "Test is block size dependent which is not supported in ref eager mode"
     )
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_tile_index_does_not_mask(self):
         @helion.kernel(config={"block_sizes": [32, 32], "indexing": "block_ptr"})
         def fn(x):

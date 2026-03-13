@@ -70,7 +70,6 @@ class TestExamples(RefEagerTestBase, TestCase):
         )
 
     @xfailIfPallas("missing barrier implementation")
-    @skipIfTileIR("PassManager::run failed")
     @skipIfXPU("Split-K barrier not supported on XPU backend")
     def test_split_k_barrier(self):
         m, k, n = 64, 512, 64
@@ -89,7 +88,6 @@ class TestExamples(RefEagerTestBase, TestCase):
         )
 
     @xfailIfPallas("missing barrier implementation")
-    @skipIfTileIR("PassManager::run failed")
     @skipIfRefEager("Test requires compiled kernel with specific config")
     def test_split_k_barrier_accuracy(self):
         """Test split_k_barrier with a shape that exposes accuracy issues.
@@ -312,7 +310,6 @@ class TestExamples(RefEagerTestBase, TestCase):
     @xfailIfPallas("BlockSpec tiling failure")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     @skipIfXPU("Failed on XPU - https://github.com/pytorch/helion/issues/795")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_template_via_closure1(self):
         bias = torch.randn([1, 1024], device=DEVICE, dtype=HALF_DTYPE)
         args = (
@@ -335,7 +332,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @xfailIfPallas("BlockSpec tiling failure")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_template_via_closure2(self):
         args = (
             torch.randn([1024, 1024], device=DEVICE, dtype=HALF_DTYPE),
@@ -357,7 +353,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @skipIfPallas("segfault in pallas codegen")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_softmax(self):
         args = (torch.randn([1024, 1024], device=DEVICE, dtype=torch.float32),)
         check_example(
@@ -372,7 +367,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @skipIfPallas("segfault in pallas codegen")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_softmax_looped(self):
         args = (torch.randn([1024, 1024], device=DEVICE, dtype=torch.float32),)
         check_example(
@@ -388,7 +382,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @skipIfPallas("segfault in pallas codegen")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_softmax_decomposed(self):
         args = (torch.randn([1024, 1024], device=DEVICE, dtype=torch.float32),)
         check_example(
@@ -412,7 +405,6 @@ class TestExamples(RefEagerTestBase, TestCase):
         )
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_softmax_two_pass_block_ptr(self):
         args = (torch.randn([1024, 1024], device=DEVICE, dtype=torch.float32),)
         check_example(
@@ -637,7 +629,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @xfailIfPallas("BlockSpec tiling failure")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_embedding_block_ptr(self):
         args = (
             torch.randint(0, 1024, [8, 128], device=DEVICE, dtype=torch.int32),
@@ -669,7 +660,6 @@ class TestExamples(RefEagerTestBase, TestCase):
     @xfailIfPallas("BlockSpec tiling failure")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     @skipIfXPU("failure on XPU")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_attention_block_pointer(self):
         args = (
             torch.randn(2, 32, 1024, 64, dtype=HALF_DTYPE, device=DEVICE),
@@ -715,7 +705,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @xfailIfPallas("BlockSpec tiling failure")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_concat_block_ptr(self):
         args = (
             torch.randn(222, 100, device=DEVICE),
@@ -869,7 +858,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     @skipIfXPU("failure on XPU")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_attention_persistent_interleaved_l2_grouping(self):
         """Test attention with persistent interleaved execution and L2 grouping for optimal performance."""
         args = (
@@ -1599,7 +1587,6 @@ class TestExamples(RefEagerTestBase, TestCase):
     @xfailIfPallas("pallas codegen failure")
     @skipIfA10G("failure on a10g")
     @skipIfXPU("Squeeze-and-excitation network not supported on XPU")
-    @skipIfTileIR("accuracy failure")
     def test_squeeze_and_excitation_net_bwd_dx(self):
         m, n, k = 256, 256, 256
         x = torch.randn([m, n], device=DEVICE, dtype=HALF_DTYPE)
@@ -1642,7 +1629,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @xfailIfPallas("pallas codegen failure")
     @skipIfA10G("failure on a10g")
-    @skipIfTileIR("accuracy failure")
     def test_squeeze_and_excitation_net_bwd_da(self):
         m, n, k = 256, 256, 256
         x = torch.randn([m, n], device=DEVICE, dtype=HALF_DTYPE)
@@ -1685,7 +1671,6 @@ class TestExamples(RefEagerTestBase, TestCase):
 
     @xfailIfPallas("pallas codegen failure")
     @skipIfA10G("failure on a10g")
-    @skipIfTileIR("accuracy failure")
     def test_squeeze_and_excitation_net_bwd_db(self):
         m, n, k = 256, 256, 256
         x = torch.randn([m, n], device=DEVICE, dtype=HALF_DTYPE)
@@ -1912,7 +1897,6 @@ class TestExamples(RefEagerTestBase, TestCase):
         )
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_batch_softmax_block_ptr(self):
         args = (torch.randn([4, 128, 1024], device=DEVICE, dtype=torch.bfloat16),)
         check_example(

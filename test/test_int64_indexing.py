@@ -62,7 +62,6 @@ class TestInt64Indexing(RefEagerTestBase, TestCase):
         self.assertIn("tl.int64", code)
 
     @skipIfRefEager("Test checks generated code")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     def test_int64_block_ptr_falls_back_to_pointer(self):
         """Test that int64 index_dtype causes block_ptr to fall back to pointer indexing.
@@ -126,7 +125,6 @@ class TestInt64Indexing(RefEagerTestBase, TestCase):
         self.assertIn("tl.int64", code)
 
     @skipIfRefEager("Test checks generated code")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     def test_int64_block_ptr_with_tile_index_falls_back(self):
         """Test int64 indexing with tile.index pattern falls back from block_ptr."""
@@ -181,7 +179,6 @@ class TestInt64Indexing(RefEagerTestBase, TestCase):
         self.assertIn("tl.int64", code)
 
     @skipIfRefEager("Test checks generated code")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     def test_int64_block_ptr_with_explicit_cast(self):
         """Test int64 indexing with explicit .to(torch.int64) cast falls back."""
@@ -243,7 +240,6 @@ class TestInt64Indexing(RefEagerTestBase, TestCase):
         self.assertIn("tl.int64", code)
 
     @skipIfRefEager("Test checks generated code")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     def test_int64_block_ptr_with_reduction_falls_back(self):
         """Test int64 indexing with block_ptr and reduction loops falls back to pointer."""
@@ -300,7 +296,6 @@ class TestInt64Indexing(RefEagerTestBase, TestCase):
         self.assertIn("tl.int64", code)
 
     @skipIfRefEager("Test checks generated code")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     def test_int64_block_ptr_matmul_falls_back(self):
         """Test int64 indexing with block_ptr in a matmul pattern falls back to pointer."""
@@ -371,7 +366,6 @@ class TestInt64Indexing(RefEagerTestBase, TestCase):
         self.assertIn("tl.int64", code)
 
     @skipIfRefEager("Test checks generated code")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     def test_int32_block_ptr_still_works(self):
         """Test that int32 (default) still uses block_ptr when requested."""

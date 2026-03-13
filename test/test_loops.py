@@ -177,7 +177,6 @@ class TestLoops(RefEagerTestBase, TestCase):
     @xfailIfPallas("large 4D tensors may exceed TPU VMEM")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
     @skipIfLowVRAM("Test requires high VRAM for [128, 128, 128, 128] tensors")
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_3d_device_loop3(self):
         args = (torch.randn([128, 128, 128, 128], device=DEVICE),)
         code, result = code_and_output(
@@ -221,7 +220,6 @@ class TestLoops(RefEagerTestBase, TestCase):
         torch.testing.assert_close(result, torch.sigmoid(x) * x, rtol=1e-3, atol=1e-3)
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_loop_fixed_block(self):
         @helion.kernel(config={"block_sizes": [], "indexing": "block_ptr"})
         def fn(x: torch.Tensor) -> torch.Tensor:
@@ -240,7 +238,6 @@ class TestLoops(RefEagerTestBase, TestCase):
         torch.testing.assert_close(result, torch.sin(args[0]))
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_loop_arg_block(self):
         @helion.kernel(config={"block_sizes": [], "indexing": "block_ptr"})
         def fn(x: torch.Tensor, block_size: int) -> torch.Tensor:
@@ -335,7 +332,6 @@ class TestLoops(RefEagerTestBase, TestCase):
 
     @xfailIfPallas("uses block_ptr indexing not supported on pallas")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_data_dependent_bounds2(self):
         @helion.kernel()
         def fn(x: torch.Tensor, end: torch.Tensor) -> torch.Tensor:
@@ -495,7 +491,6 @@ class TestLoops(RefEagerTestBase, TestCase):
 
     @xfailIfPallas("uses block_ptr indexing not supported on pallas")
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_reorder_with_register_block_size(self):
         @helion.kernel(
             config={
@@ -517,7 +512,6 @@ class TestLoops(RefEagerTestBase, TestCase):
         torch.testing.assert_close(result, args[0] + 1)
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_l2_grouping_with_register_block_size(self):
         @helion.kernel(
             config={

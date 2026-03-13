@@ -14,7 +14,6 @@ from helion._testing import code_and_output
 from helion._testing import onlyBackends
 from helion._testing import skipIfPallas
 from helion._testing import skipIfRefEager
-from helion._testing import skipIfTileIR
 from helion._testing import xfailIfPallas
 import helion.language as hl
 
@@ -127,7 +126,6 @@ class TestControlFlow(RefEagerTestBase, TestCase):
         torch.testing.assert_close(result, torch.sigmoid(x))
 
     @patch.object(_compat, "_supports_tensor_descriptor", lambda: False)
-    @skipIfTileIR("TileIR does not support block_ptr indexing")
     def test_constant_false(self):
         @helion.kernel(config={"block_size": [32, 32], "indexing": "block_ptr"})
         def fn(x):
