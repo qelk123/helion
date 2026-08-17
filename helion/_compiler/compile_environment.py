@@ -880,7 +880,12 @@ class CompileEnvironment:
         for rdim in self.block_sizes:
             if not rdim.reduction or not isinstance(rdim.size, (int, torch.SymInt)):
                 continue
-            if _is_unbacked_symint(rdim.size) and _is_unbacked_symint(size):
+            if isinstance(rdim.size, torch.SymInt) or isinstance(size, torch.SymInt):
+                # Any SymInt involvement must use the guard-free comparison.
+                # A raw `==` between an unbacked symbol (hint 64) and a
+                # concrete 64 (e.g. a specialized head_dim) installs an Eq
+                # guard that replaces the symbol globally, mis-binding every
+                # later shape lookup (locks attention tuning to block_m=64).
                 if self.known_equal(rdim.size, size):
                     return rdim
             elif rdim.size == size:
@@ -1301,7 +1306,70 @@ class CompileEnvironment:
     def known_multiple(self, a: sympy.Expr, b: int | torch.SymInt) -> bool:
         if isinstance(a, (int, sympy.Integer)) and isinstance(b, int):
             return (int(a) % b) == 0
+        if isinstance(a, sympy.Expr) and isinstance(b, int) and b > 0:
+            return self._expr_known_multiple(a, b)
         return False
+
+    def _expr_known_multiple(self, expr: sympy.Expr, b: int) -> bool:
+        """Best-effort divisibility proof for tile-derived symbolic extents.
+
+        A tile's ``begin`` is always aligned to that block's configured block
+        size; its ``end`` additionally requires the tiled extent itself to be
+        a multiple (the last tile clamps to the extent). Sums of multiples
+        stay multiples, as do integer scalings. Proving divisibility lets
+        loops over e.g. ``hl.tile(0, tile_m.begin)`` drop their boundary
+        masks (and keep tensor-descriptor loads) whenever the outer block
+        size is a multiple of the inner one.
+        """
+        if isinstance(expr, sympy.Integer):
+            return int(expr) % b == 0
+        if isinstance(expr, sympy.Symbol):
+            return self._symbol_known_multiple(expr, b)
+        if isinstance(expr, sympy.Add):
+            return all(self._expr_known_multiple(t, b) for t in expr.args)
+        if isinstance(expr, sympy.Mul):
+            int_part = 1
+            other = []
+            for f in expr.args:
+                if isinstance(f, sympy.Integer):
+                    int_part *= int(f)
+                else:
+                    other.append(f)
+            if int_part != 0 and int_part % b == 0:
+                return True
+            return any(self._expr_known_multiple(f, b) for f in other)
+        return False
+
+    def _symbol_known_multiple(self, sym: sympy.Symbol, b: int) -> bool:
+        from .variable_origin import TileBeginOrigin
+        from .variable_origin import TileEndOrigin
+
+        try:
+            from .host_function import HostFunction
+
+            info = HostFunction.current().expr_to_origin.get(sym)
+        except Exception:  # no active host function
+            return False
+        if info is None:
+            return False
+        origin = info.origin
+        if not isinstance(origin, (TileBeginOrigin, TileEndOrigin)):
+            return False
+        block_id = origin.block_id
+        try:
+            from .device_function import DeviceFunction
+
+            config = DeviceFunction.current().config
+        except Exception:  # outside per-config codegen
+            return False
+        block_size = self.block_sizes[block_id].from_config(config)
+        if not isinstance(block_size, int) or block_size % b != 0:
+            return False
+        if isinstance(origin, TileEndOrigin):
+            # end = min(begin + block_size, extent): the clamped case needs
+            # the extent divisible too.
+            return self.known_multiple(self.block_sizes[block_id].numel, b)
+        return True
 
     @property
     def backend(self) -> Backend:
